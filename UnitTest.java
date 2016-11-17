@@ -354,4 +354,15 @@ public class UnitTest {
             "	3\n" ;
         assertEquals(strWrite ,strReturn);        
     }
+    
+    //tests network connection by testing client-server transfer
+    //if server receives info from client, server returns "OK!"
+    @Test
+    public void testNetWorkConnection() {
+        if(NetworkConnection.getNetworkConnection().isStartServer()){
+                NetworkConnection.getNetworkConnection().startServer();
+        }
+        String strReturn=NetworkConnection.getNetworkConnection().startClient(new Obj1());
+        assertEquals(strReturn ,"OK!");
+    }  
 }
