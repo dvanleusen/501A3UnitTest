@@ -239,4 +239,119 @@ public class UnitTest {
                 "</serialized>"+System.lineSeparator() + System.lineSeparator();
             assertEquals(strWrite ,strReturn); 
     }  
+    
+    // tests deserialization 
+    // tests deserialized object from xml documents for 5 scenarios
+    @Test
+    public void testDeserialize() throws IOException {
+        MySerializer ser=new MySerializer();  
+        String strReturn="";
+        String strWrite="";
+        boolean blnIsFile = false;  
+        
+        //scenario 1
+        strReturn= ser.deserialization(ser.serialization(new Obj1()),blnIsFile); 
+        strWrite="========== Object(ID: 0) ========== \n" +
+            "Name: Obj1\n" +
+            "Field: int customerID = 0\n" +
+            "Field: boolean check = false\n"  ;
+        assertEquals(strWrite ,strReturn);
+
+        //scenario 2
+        strReturn= ser.deserialization(ser.serialization(new Obj2()),blnIsFile);  
+        strWrite="========== Object(ID: 0) ========== \n" +
+            "Name: Obj2\n" +
+            "Field: Obj1 owner\n" +
+            "	Reference: 1\n" +
+            "Field: int intAccount = 0\n" +
+            "========== Object(ID: 1) ========== \n" +
+            "Name: Obj1\n" +
+            "Field: int customerID = 10001\n" +
+            "Field: boolean check = true\n" ;
+        assertEquals(strWrite ,strReturn);        
+
+        //scenario 3
+        strReturn= ser.deserialization(ser.serialization(new Obj3()),blnIsFile);  
+        strWrite="========== Object(ID: 0) ========== \n" +
+            "Name: Obj3\n" +
+            "Field: int[] newBooks\n" +
+            "	Reference: 1\n" +
+            "========== Object(ID: 1) ========== \n" +
+            "int[3]\n" +
+            "Values:\n" +
+            "	1\n" +
+            "	2\n" +
+            "	3\n" ;
+       assertEquals(strWrite ,strReturn);
+
+       //scenario 4
+        strReturn= ser.deserialization(ser.serialization(new Obj4()),blnIsFile);  
+        strWrite="========== Object(ID: 0) ========== \n" +
+            "Name: Obj4\n" +
+            "Field: ObjBook[] arrayBooks\n" +
+            "	Reference: 1\n" +
+            "========== Object(ID: 1) ========== \n" +
+            "ObjBook[4]\n" +
+            "Values:\n" +
+            "	Reference: 2\n" +
+            "	Reference: 3\n" +
+            "	Reference: 4\n" +
+            "	Reference: 5\n" +
+            "========== Object(ID: 2) ========== \n" +
+            "Name: ObjBook\n" +
+            "Field: String referenceID\n" +
+            "Field: String name\n" +
+            "Field: String author\n" +
+            "Field: double price = 32.0\n" +
+            "========== Object(ID: 3) ========== \n" +
+            "Name: ObjBook\n" +
+            "Field: String referenceID\n" +
+            "Field: String name\n" +
+            "Field: String author\n" +
+            "Field: double price = 37.0\n" +
+            "========== Object(ID: 4) ========== \n" +
+            "Name: ObjBook\n" +
+            "Field: String referenceID\n" +
+            "Field: String name\n" +
+            "Field: String author\n" +
+            "Field: double price = 45.0\n" +
+            "========== Object(ID: 5) ========== \n" +
+            "Name: ObjBook\n" +
+            "Field: String referenceID\n" +
+            "Field: String name\n" +
+            "Field: String author\n" +
+            "Field: double price = 46.5\n"  ;
+        assertEquals(strWrite ,strReturn); 
+
+        //scenario 5
+        strReturn= ser.deserialization(ser.serialization(new Obj5()),blnIsFile);  
+        strWrite="========== Object(ID: 0) ========== \n" +
+            "Name: Obj5\n" +
+            "Field: ArrayList favorBooks\n" +
+            "	Reference: 1\n" +
+            "========== Object(ID: 1) ========== \n" +
+            "ArrayList\n" +
+            "Length:5\n" +
+            "Values:\n" +
+            "	Reference ID: 2\n" +
+            "	Reference ID: 3\n" +
+            "	Gulliver Travels\n" +
+            "	Clarissa\n" +
+            "	Tom Jones\n" +
+            "========== Object(ID: 2) ========== \n" +
+            "Name: Obj1\n" +
+            "Field: int customerID = 0\n" +
+            "Field: boolean check = false\n" +
+            "========== Object(ID: 3) ========== \n" +
+            "Name: Obj3\n" +
+            "Field: int[] newBooks\n" +
+            "	Reference: 4\n" +
+            "========== Object(ID: 4) ========== \n" +
+            "int[3]\n" +
+            "Values:\n" +
+            "	1\n" +
+            "	2\n" +
+            "	3\n" ;
+        assertEquals(strWrite ,strReturn);        
+    }
 }
