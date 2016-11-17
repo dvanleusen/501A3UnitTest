@@ -1,6 +1,5 @@
 
 package a3;
-import java.util.ArrayList;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import java.io.*;
@@ -13,10 +12,10 @@ import java.io.*;
 * <p>
 * * This is the Unit Test file to test unit codes. 
 */
-
-//tests objCreator to see if corresponding message is displayed when object type is selected
 public class UnitTest {
-    @Test  
+    // tests object creator
+	// if it works properly, then it prints string when relevant selection is made
+	@Test
     public void testObjectCreator() {
         ObjectCreator objCreator=new ObjectCreator();
         String strReturn="";
@@ -30,47 +29,214 @@ public class UnitTest {
                 "Exit\n"+
                 "Invalid selection\n" ,strReturn);
     }
-    
-    //tests if printing to file is working properly
+	
+	// tests writing string to a file
+	// tests if it writes properly by comparing the file content to the original string
     @Test  
     public void testOutput() {
-        FileOutput fOutput=new FileOutput();
+        FileHandler fHandler=new FileHandler();
         String strFile="Output.txt";
         String strWrite="An object that contains only primitives"+System.lineSeparator()+
               "An object that contains reference to other objects";
         try{
-            fOutput.fileWriteToFile(strFile,strWrite );
-            fOutput.fileClose();
+            fHandler.fileWriteToFile(strFile,strWrite );
+            fHandler.fileClose();
         }
         catch(Exception e){
-            if (fOutput!=null)
-                fOutput.fileClose();
+            if (fHandler!=null)
+                fHandler.fileClose();
         }
-        //reads string from the file created to check if the string remains the same
         
-        String  strReturn="";
-        BufferedReader br =null;
-        try{
-            br = new BufferedReader(new FileReader(strFile));
-            StringBuilder strBuilder = new StringBuilder();
-            String strline = br.readLine();
-            while (strline!=null){   
-                if (strBuilder.length()!=0)  
-                    strBuilder.append(System.lineSeparator());
-                strBuilder.append(strline);              
-                strline = br.readLine();
-            }
-            strReturn=strBuilder.toString();
-        }
-       catch(Exception e){}
-       finally { 
-            try{ br.close();}
-            catch(Exception ce){}    
-        }
-//        System.out.println(strWrite.length());
-//        System.out.println(strReturn.length());
-//        System.out.println(strWrite);
-//        System.out.println(strReturn);
+        //read file
+        String  strReturn=fHandler.fileReader(strFile);
         assertEquals(strWrite ,strReturn);
     }
+    
+    // tests serialization 
+    // tests serialized object to xml documents for 5 scenarios
+    @Test
+    public void testSerialize() throws IOException {       
+        MySerializer ser=new MySerializer();
+        // scenario 1
+          
+        String strReturn=ser.serialization(new Obj1());  
+             
+        String strWrite="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+System.lineSeparator() +
+            "<serialized>"+System.lineSeparator() +
+            "  <object class=\"a3.Obj1\" id=\"0\">"+System.lineSeparator() +
+            "    <field name=\"customerID\" type=\"int\" declaringclass=\"a3.Obj1\">"+System.lineSeparator() +
+            "      <value>0</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"check\" type=\"boolean\" declaringclass=\"a3.Obj1\">"+System.lineSeparator() +
+            "      <value>false</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "</serialized>"+System.lineSeparator() + System.lineSeparator();
+        assertEquals(strWrite ,strReturn);
+       
+        // scenario 2 
+        strReturn= ser.serialization(new Obj2());
+        
+        strWrite="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+System.lineSeparator() +
+            "<serialized>"+System.lineSeparator() +
+            "  <object class=\"a3.Obj2\" id=\"0\">"+System.lineSeparator() +
+            "    <field name=\"owner\" type=\"a3.Obj1\" declaringclass=\"a3.Obj2\">"+System.lineSeparator() +
+            "      <reference>1</reference>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"intAccount\" type=\"int\" declaringclass=\"a3.Obj2\">"+System.lineSeparator() +
+            "      <value>0</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"a3.Obj1\" id=\"1\">"+System.lineSeparator() +
+            "    <field name=\"customerID\" type=\"int\" declaringclass=\"a3.Obj1\">"+System.lineSeparator() +
+            "      <value>10001</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"check\" type=\"boolean\" declaringclass=\"a3.Obj1\">"+System.lineSeparator() +
+            "      <value>true</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "</serialized>"+System.lineSeparator() + System.lineSeparator();
+        assertEquals(strWrite ,strReturn);
+
+        //scenario 3
+        strReturn=ser.serialization(new Obj3());
+       
+        strWrite="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+System.lineSeparator() +
+            "<serialized>"+System.lineSeparator() +
+            "  <object class=\"a3.Obj3\" id=\"0\">"+System.lineSeparator() +
+            "    <field name=\"newBooks\" type=\"[I\" declaringclass=\"a3.Obj3\">"+System.lineSeparator() +
+            "      <reference>1</reference>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"[I\" id=\"1\" length=\"3\">"+System.lineSeparator() +
+            "    <value>1</value>"+System.lineSeparator() +
+            "    <value>2</value>"+System.lineSeparator() +
+            "    <value>3</value>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "</serialized>"+System.lineSeparator() + System.lineSeparator();
+        assertEquals(strWrite ,strReturn);
+
+        //scenario 4
+        strReturn=ser.serialization(new Obj4());
+            strWrite="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+System.lineSeparator() +
+            "<serialized>"+System.lineSeparator() +
+            "  <object class=\"a3.Obj4\" id=\"0\">"+System.lineSeparator() +
+            "    <field name=\"arrayBooks\" type=\"[La3.ObjBook;\" declaringclass=\"a3.Obj4\">"+System.lineSeparator() +
+            "      <reference>1</reference>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"[La3.ObjBook;\" id=\"1\" length=\"4\">"+System.lineSeparator() +
+            "    <value>"+System.lineSeparator() +
+            "      <reference>2</reference>"+System.lineSeparator() +
+            "    </value>"+System.lineSeparator() +
+            "    <value>"+System.lineSeparator() +
+            "      <reference>3</reference>"+System.lineSeparator() +
+            "    </value>"+System.lineSeparator() +
+            "    <value>"+System.lineSeparator() +
+            "      <reference>4</reference>"+System.lineSeparator() +
+            "    </value>"+System.lineSeparator() +
+            "    <value>"+System.lineSeparator() +
+            "      <reference>5</reference>"+System.lineSeparator() +
+            "    </value>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"a3.ObjBook\" id=\"2\">"+System.lineSeparator() +
+            "    <field name=\"referenceID\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>ISBN 978-0-111-1</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"name\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>OH SHE GLOWS EVERY DAY</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"author\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>Angela Liddon</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"price\" type=\"double\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>32.0</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"a3.ObjBook\" id=\"3\">"+System.lineSeparator() +
+            "    <field name=\"referenceID\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>ISBN 978-0-111-2</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"name\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>THE WHISTLER</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"author\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>John Grisham</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"price\" type=\"double\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>37.0</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"a3.ObjBook\" id=\"4\">"+System.lineSeparator() +
+            "    <field name=\"referenceID\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>ISBN 978-0-111-3</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"name\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>COOKING FOR JEFFREY</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"author\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>Ina Garten</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"price\" type=\"double\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>45.0</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "  <object class=\"a3.ObjBook\" id=\"5\">"+System.lineSeparator() +
+            "    <field name=\"referenceID\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>ISBN 978-0-111-4</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"name\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>APPETITES: A COOKBOOK</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"author\" type=\"java.lang.String\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>Anthony Bourdain</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "    <field name=\"price\" type=\"double\" declaringclass=\"a3.ObjBook\">"+System.lineSeparator() +
+            "      <value>46.5</value>"+System.lineSeparator() +
+            "    </field>"+System.lineSeparator() +
+            "  </object>"+System.lineSeparator() +
+            "</serialized>"+System.lineSeparator() + System.lineSeparator();
+        assertEquals(strWrite ,strReturn);
+
+        //scenario 5
+        strReturn=ser.serialization(new Obj5());
+            strWrite="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+System.lineSeparator() +
+                "<serialized>"+System.lineSeparator() +
+                "  <object class=\"a3.Obj5\" id=\"0\">"+System.lineSeparator() +
+                "    <field name=\"favorBooks\" type=\"java.util.ArrayList\" declaringclass=\"a3.Obj5\">"+System.lineSeparator() +
+                "      <reference>1</reference>"+System.lineSeparator() +
+                "    </field>"+System.lineSeparator() +
+                "  </object>"+System.lineSeparator() +
+                "  <object class=\"java.util.ArrayList\" id=\"1\" length=\"5\">"+System.lineSeparator() +
+                "    <value>"+System.lineSeparator() +
+                "      <reference>2</reference>"+System.lineSeparator() +
+                "    </value>"+System.lineSeparator() +
+                "    <value>"+System.lineSeparator() +
+                "      <reference>3</reference>"+System.lineSeparator() +
+                "    </value>"+System.lineSeparator() +
+                "    <value>Gulliver Travels</value>"+System.lineSeparator() +
+                "    <value>Clarissa</value>"+System.lineSeparator() +
+                "    <value>Tom Jones</value>"+System.lineSeparator() +
+                "  </object>"+System.lineSeparator() +
+                "  <object class=\"a3.Obj1\" id=\"2\">"+System.lineSeparator() +
+                "    <field name=\"customerID\" type=\"int\" declaringclass=\"a3.Obj1\">"+System.lineSeparator() +
+                "      <value>0</value>"+System.lineSeparator() +
+                "    </field>"+System.lineSeparator() +
+                "    <field name=\"check\" type=\"boolean\" declaringclass=\"a3.Obj1\">"+System.lineSeparator() +
+                "      <value>false</value>"+System.lineSeparator() +
+                "    </field>"+System.lineSeparator() +
+                "  </object>"+System.lineSeparator() +
+                "  <object class=\"a3.Obj3\" id=\"3\">"+System.lineSeparator() +
+                "    <field name=\"newBooks\" type=\"[I\" declaringclass=\"a3.Obj3\">"+System.lineSeparator() +
+                "      <reference>4</reference>"+System.lineSeparator() +
+                "    </field>"+System.lineSeparator() +
+                "  </object>"+System.lineSeparator() +
+                "  <object class=\"[I\" id=\"4\" length=\"3\">"+System.lineSeparator() +
+                "    <value>1</value>"+System.lineSeparator() +
+                "    <value>2</value>"+System.lineSeparator() +
+                "    <value>3</value>"+System.lineSeparator() +
+                "  </object>"+System.lineSeparator() +
+                "</serialized>"+System.lineSeparator() + System.lineSeparator();
+            assertEquals(strWrite ,strReturn); 
+    }  
 }
